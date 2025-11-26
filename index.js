@@ -1,95 +1,97 @@
-const express = require("express");
-const app = express();
+const express = require('express')
+const app = express()
 
-const morgan = require("morgan");
+const morgan = require('morgan')
+const cors = require('cors')
+app.use(cors())
 
-morgan.token("post-data", (req) => {
-  if (req.method === "POST") return JSON.stringify(req.body);
-  return "";
-});
+morgan.token('post-data', req => {
+  if (req.method === 'POST') return JSON.stringify(req.body)
+  return ''
+})
 
 app.use(
   morgan(
-    ":method :url :status :res[content-length] - :response-time ms :post-data"
+    ':method :url :status :res[content-length] - :response-time ms :post-data'
   )
-);
-app.use(express.json());
+)
+app.use(express.json())
 
 let persons = [
   {
     id: 1,
-    name: "Arto Hellas",
-    number: "040-123456",
+    name: 'Arto Hellas',
+    number: '040-123456'
   },
   {
     id: 2,
-    name: "Ada Lovelace",
-    number: "39-44-5323523",
+    name: 'Ada Lovelace',
+    number: '39-44-5323523'
   },
   {
     id: 3,
-    name: "Dan Abramov",
-    number: "12-43-234345",
+    name: 'Dan Abramov',
+    number: '12-43-234345'
   },
   {
     id: 4,
-    name: "Mary Poppendieck",
-    number: "39-23-6423122",
-  },
-];
+    name: 'Mary Poppendieck',
+    number: '39-23-6423122'
+  }
+]
 
-app.get("/", (request, response) => {
-  response.send("<h1>Welcome to the Persons Phonebook</h1>");
-});
+app.get('/', (request, response) => {
+  response.send('<h1>Welcome to the Persons Phonebook</h1>')
+})
 
-app.get("/api/persons", (request, response) => {
-  response.json(persons);
-});
+app.get('/api/persons', (request, response) => {
+  response.json(persons)
+})
 
-app.get("/api/persons/:id", (request, response) => {
-  const id = Number(request.params.id);
-  const person = persons.find((person) => person.id === id);
-  response.json(person);
-});
+app.get('/api/persons/:id', (request, response) => {
+  const id = Number(request.params.id)
+  const person = persons.find(person => person.id === id)
+  response.json(person)
+})
 
-app.get("/info", (request, response) => {
-  const fecha = new Date();
+app.get('/info', (request, response) => {
+  const fecha = new Date()
   response.send(`<p>Phonebook has info for ${persons.length} people<p>
-    <div>${fecha}<div>`);
-});
+    <div>${fecha}<div>`)
+})
 
 const generateId = () => {
-  const randomId = Math.floor(Math.random() * 1000000);
-  return randomId;
-};
-app.post("/api/persons", (request, response) => {
-  const body = request.body;
+  const randomId = Math.floor(Math.random() * 1000000)
+  return randomId
+}
+app.post('/api/persons', (request, response) => {
+  const body = request.body
   if (!body.name || !body.number) {
     return response.status(400).json({
-      error: "content missing",
-    });
+      error: 'content missing'
+    })
   }
-  if (persons.some((person) => person.name === body.name)) {
+  if (persons.some(person => person.name === body.name)) {
     return response.status(409).json({
-      error: "name must be unique",
-    });
+      error: 'name must be unique'
+    })
   }
   const person = {
     id: generateId(),
     name: body.name,
-    number: body.number,
-  };
-  persons = persons.concat(person);
-  response.json(person);
-});
+    number: body.number
+  }
+  persons = persons.concat(person)
+  response.json(person)
+})
 
-app.delete("/api/persons/:id", (request, response) => {
-  const id = Number(request.params.id);
-  persons = persons.filter((person) => person.id !== id);
-  response.status(204).end();
-});
+app.delete('/api/persons/:id', (request, response) => {
+  const id = Number(request.params.id)
+  persons = persons.filter(person => person.id !== id)
+  response.status(204).end()
+})
 
-const PORT = 3001;
+const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+  console.log(`Server running on port ${PORT}`)
+})
